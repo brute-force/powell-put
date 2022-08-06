@@ -7,10 +7,12 @@ import "bootstrap/dist/css/bootstrap.css";
 
 const Stocks = () => {
   let port = process.env.PORT;
+  let feed = '/sp-500';
 
   if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
     port = process.env.REACT_APP_API_PORT;
+    feed = `http://localhost:${port}/sp-500`;
   }
 
   console.log(port);
@@ -26,7 +28,7 @@ const Stocks = () => {
     const getStocks = async () => {
       try {
         // const response = await fetch(`http://localhost:${port}/sp-500`);
-        const response = await fetch(`/sp-500`);
+        const response = await fetch(feed);
  
         if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
