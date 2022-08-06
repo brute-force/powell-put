@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Stocks from './components/stocks';
 import Chart from './components/chart';
