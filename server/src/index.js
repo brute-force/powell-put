@@ -6,7 +6,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app = require('./app');
-const port = process.env.PORT || 5000;
+// const port = process.env.PORT || 5000;
+const port = 5000;
 
 const dbo = require("./db/conn");
 
