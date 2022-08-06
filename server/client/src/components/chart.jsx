@@ -38,29 +38,33 @@ const Chart = () => {
     // console.log('useEffect');
 
     const getHistoricalData = async () => {
-      // const response = await fetch(`http://localhost:3001/historical/${ticker}`);
-      const response = await fetch(`http://localhost:3001/historical?ticker=${ticker}&period=${period}`);
+      try {
+        const response = await fetch(`http://localhost:3001/historical?ticker=${ticker}&period=${period}`);
  
-      const json = await response.json();
-      const quotes = json.quotes;
-      const quoteStart = quotes[0];
-      const quoteEnd = quotes[quotes.length - 1];
-
-      setPriceStart(formatMoney(quoteStart.close));
-      setPriceEnd(formatMoney(quoteEnd.close));
-      setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
-
-      setData(quotes.map((quote) => {
-        let { date, ...other } = quote;
-
-        return {
-          date: moment(date).format(),
-          // date: moment.utc(date).valueOf(),
-          ...other
-        };
-
-      }));
-      // setData(quotes.map((quote) => ({ date: moment(quote.date).format(), ...rest}));
+        const json = await response.json();
+        const quotes = json.quotes;
+        const quoteStart = quotes[0];
+        const quoteEnd = quotes[quotes.length - 1];
+  
+        setPriceStart(formatMoney(quoteStart.close));
+        setPriceEnd(formatMoney(quoteEnd.close));
+        setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
+  
+        setData(quotes.map((quote) => {
+          let { date, ...other } = quote;
+  
+          return {
+            date: moment(date).format(),
+            // date: moment.utc(date).valueOf(),
+            ...other
+          };
+  
+        }));
+        // setData(quotes.map((quote) => ({ date: moment(quote.date).format(), ...rest}));
+      } catch(err) {
+        console.log(err.message);
+        alert(err.message);
+      }
     };
 
     getHistoricalData();

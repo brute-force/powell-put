@@ -15,15 +15,20 @@ const Stocks = () => {
     // console.log(`loading s&p 500 stocks...`);
 
     const getStocks = async () => {
-      const response = await fetch(`http://localhost:3001/sp-500`);
+      try {
+        const response = await fetch(`http://localhost:3001/sp-500`);
  
-      if (!response.ok) {
-        const message = `An error occurred: ${response.statusText}`;
-        window.alert(message);
+        if (!response.ok) {
+          const message = `An error occurred: ${response.statusText}`;
+          window.alert(message);
+        }
+    
+        const stocksList = await response.json();
+        setStocks(stocksList);
+      } catch (err) {
+        console.log(err.message);
+        alert(err.message);
       }
-  
-      const stocksList = await response.json();
-      setStocks(stocksList);
     };
 
     getStocks();
