@@ -1,5 +1,8 @@
 if (process.env.NODE_ENV !== 'production') {
+  console.log(`loading NODE_ENV ${process.env.NODE_ENV}`);
   require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+} else {
+  console.log(process.env);
 }
 
 const app = require('./app');
