@@ -16,7 +16,7 @@ const Stocks = () => {
 
     const getStocks = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/sp-500`);
+        const response = await fetch(`http://localhost:${process.env.PORT}/sp-500`);
  
         if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;

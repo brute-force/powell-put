@@ -39,7 +39,7 @@ const Chart = () => {
 
     const getHistoricalData = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/historical?ticker=${ticker}&period=${period}`);
+        const response = await fetch(`http://localhost:${process.env.PORT}/historical?ticker=${ticker}&period=${period}`);
  
         const json = await response.json();
         const quotes = json.quotes;
