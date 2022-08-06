@@ -1,0 +1,20 @@
+{
+  "name": "powell-put",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/src/index.js",
+    "heroku-postbuild": "cd ./client && npm install && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brute-force/powell-put.git"
+  },
+  "author": "Reuel Alvarez <reuel.alvarez@gmail.com> (https://www.panix.com//~reuel/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brute-force/powell-put/issues"
+  },
+  "homepage": "https://github.com/brute-force/powell-put#readme"
+}
