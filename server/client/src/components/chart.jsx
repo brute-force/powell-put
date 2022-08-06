@@ -26,10 +26,12 @@ moment.defaultFormat = 'MM/DD/YY';
 
 const Chart = () => {
   let port = process.env.PORT;
+  let feed = '/historical';
 
   if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
     port = process.env.REACT_APP_API_PORT;
+    feed = `http://localhost:${port}/historical`;
   }
 
   const { ticker }  = useParams();
@@ -46,7 +48,9 @@ const Chart = () => {
 
     const getHistoricalData = async () => {
       try {
-        const response = await fetch(`http://localhost:${port}/historical?ticker=${ticker}&period=${period}`);
+        console.log(feed);
+        // const response = await fetch(`http://localhost:${port}/historical?ticker=${ticker}&period=${period}`);
+        const response = await fetch(`${feed}?ticker=${ticker}&period=${period}`);
  
         const json = await response.json();
         const quotes = json.quotes;
