@@ -10,7 +10,7 @@ routerStocks.route('/historical').get(async (req, res) => {
     ? now.clone().subtract(1, req.query.period).format()
     : now.clone().startOf('year').format();
 
-  // console.log('periodStart', periodStart);
+  console.log('periodStart', periodStart);
   
   try {
     const response = await yF._chart(req.query.ticker, {
