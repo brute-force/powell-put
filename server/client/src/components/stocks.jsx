@@ -25,7 +25,8 @@ const Stocks = () => {
 
     const getStocks = async () => {
       try {
-        const response = await fetch(`http://localhost:${port}/sp-500`);
+        // const response = await fetch(`http://localhost:${port}/sp-500`);
+        const response = await fetch(`/sp-500`);
  
         if (!response.ok) {
           const message = `An error occurred: ${response.statusText}`;
