@@ -7,7 +7,8 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  ReferenceLine
 } from 'recharts';
 import { 
   ToggleButton, 
@@ -20,6 +21,34 @@ import moment from 'moment';
 moment.defaultFormat = 'MM/DD/YY';
 
 const Chart = () => {
+  const fomcMeetings = [
+    {
+      id: 1,
+      meetingStart: '01/25/22',
+      meetingEnd: '01/26/22'
+    },
+    {
+      id: 2,
+      meetingStart: '03/15/22',
+      meetingEnd: '03/16/22'
+    },
+    {
+      id: 3,
+      meetingStart: '05/03/22',
+      meetingEnd: '05/04/22'
+    },
+    {
+      id: 4,
+      meetingStart: '06/14/22',
+      meetingEnd: '06/15/22'
+    },
+    {
+      id: 5,
+      meetingStart: '07/26/22',
+      meetingEnd: '07/27/22'
+    },
+  ];
+
   const { ticker }  = useParams();
   const [period, setPeriod] = useState('');
   const [periodStart, setPeriodStart] = useState('');
@@ -151,6 +180,23 @@ const Chart = () => {
           <Tooltip
             formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2) > 0 ? `+${toFixed(value - unformat(priceStart), 2)}` : toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
           />
+          {
+            // fomcMeetings.map((meeting) => <ReferenceLine key={ meeting.id } x={ meeting.meetingEnd } stroke="green" strokeDasharray="3 3" />)
+            fomcMeetings.map(({ id, meetingEnd}) => {
+              if (moment(meetingEnd).utc() >= moment(periodStart).utc() && moment(meetingEnd).utc() <= moment().utc()) {
+                return (
+                  <ReferenceLine 
+                    key={ id }
+                    x={ meetingEnd }
+                    stroke="green"
+                    strokeDasharray="3 3"
+                    label={{ value: `FOMC ${meetingEnd}`, position: 'top', fontSize: 15}} />
+                );
+              } else {
+                return '';
+              }
+            })
+          }
           <Area
             type="monotone"
             dataKey="close"
