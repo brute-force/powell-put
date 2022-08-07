@@ -90,7 +90,7 @@ const Chart = () => {
           <tr>
             <td className="text-start">{ priceStart }</td>
             <td className="text-start">{ priceEnd }</td>
-            <td className="text-start">{ priceChange} ({ returnPct }%)</td>
+            <td className="text-start">{ priceChange > 0 ? `+${priceChange}`: priceChange } ({ returnPct }%)</td>
           </tr>
         </tbody>
       </table>
@@ -149,7 +149,7 @@ const Chart = () => {
             tickFormatter={(value) => `$${toFixed(value, 2)}`}
           />
           <Tooltip
-            formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
+            formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2) > 0 ? `+${toFixed(value - unformat(priceStart), 2)}` : toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
           />
           <Area
             type="monotone"
