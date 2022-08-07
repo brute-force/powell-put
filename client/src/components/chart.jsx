@@ -1,4 +1,4 @@
-import { useEffect, useState, } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   ResponsiveContainer,
@@ -110,9 +110,9 @@ const Chart = () => {
       <table className="table table-bordered">
         <thead>
           <tr>
-            <th className="text-start">Price ({ periodStart })</th>
-            <th className="text-start">Price (close)</th>
-            <th className="text-start">Performance</th>
+            <th className="text-start" valign="top">Price ({ periodStart })</th>
+            <th className="text-start" valign="top">Price (close)</th>
+            <th className="text-start" valign="top">Performance</th>
           </tr>
         </thead>
         <tbody>
@@ -142,8 +142,8 @@ const Chart = () => {
           data={data}
           margin={{
             top: 50,
-            right: 20,
-            left: 20,
+            right: 5,
+            left: 10,
             bottom: 0
           }}
         >
@@ -159,11 +159,11 @@ const Chart = () => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
-            dataKey="date" 
+            dataKey="date"
             interval="preserveStartEnd" 
             tickMargin="10"
             style={{
-              fontSize: '0.8rem',
+              fontSize: '0.8rem'
             }}
           />
           <YAxis
@@ -173,7 +173,7 @@ const Chart = () => {
             domain={[dataMin => (dataMin * 0.88), dataMax => (Math.ceil(dataMax))]}
             tickMargin="10"
             style={{
-              fontSize: '0.8rem',
+              fontSize: '0.8rem'
             }}
             tickFormatter={(value) => `$${toFixed(value, 2)}`}
           />
@@ -183,14 +183,22 @@ const Chart = () => {
           {
             // fomcMeetings.map((meeting) => <ReferenceLine key={ meeting.id } x={ meeting.meetingEnd } stroke="green" strokeDasharray="3 3" />)
             fomcMeetings.map(({ id, meetingEnd}) => {
-              if (moment(meetingEnd).utc() >= moment(periodStart).utc() && moment(meetingEnd).utc() <= moment().utc()) {
+              const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
+              const mPeriodStart = moment(periodStart, moment.defaultFormat);
+              
+              if (mMeetingEnd.isAfter(mPeriodStart) && mMeetingEnd.isBefore(moment())) {
                 return (
                   <ReferenceLine 
                     key={ id }
                     x={ meetingEnd }
                     stroke="green"
                     strokeDasharray="3 3"
-                    label={{ value: `FOMC ${meetingEnd}`, position: 'top', fontSize: 15}} />
+                    // label={{ value: `FOMC ${meetingEnd}`, position: 'top', fontSize: 15}}
+                    // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15 }}
+                    // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
+                    // label={ <CustomizedLabel value={`FOMC ${moment(meetingEnd).format('MM/DD')}`} /> }
+                    label={ <CustomizedLabel value={`${moment(meetingEnd).format('MM/DD')}`} /> }
+                  />
                 );
               } else {
                 return '';
@@ -207,6 +215,63 @@ const Chart = () => {
         </AreaChart>
       </ResponsiveContainer>
     </div>
+  );
+};
+
+// eslint-disable-next-line react/prop-types
+const _CustomizedLabel  = ({ value, viewBox: { x, y} }) => (
+  <g>
+    <foreignObject x={x-35} y={y-40} width={70} height={50}>
+      <div align="center" style={{ fontSize: '0.8rem' }}>
+        { value }
+      </div>
+    </foreignObject>
+  </g>
+);
+
+// eslint-disable-next-line react/prop-types
+const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
+  return (
+    <g>
+      {/* <rect
+        x={ x - 35 }
+        y={ y - 40 }
+        fill="#aaa"
+        width={70}
+        height={50}
+      /> */}
+      <text
+        x={ x }
+        y={ y }
+        fill="#111"
+        dy={ -20 }
+        dx={ -20 }
+        textAnchor="start"
+        transform={`rotate(-30,${x},${y})`}
+      >
+        { value }
+      </text>
+    </g>
+  );
+};
+
+// eslint-disable-next-line react/prop-types
+const __CustomizedLabel = ({ fill, value, textAnchor, fontSize, viewBox: { width, height, x, y }, dx, dy }) => {
+  // const _x = width + x + 20;
+  // const _y = y - 6;
+
+  return (
+    <text 
+      x={width + x - 15} y={y - 6}
+      dy={dy}
+      dx={dx}
+      fill={fill}
+      fontSize={fontSize || '0.8rem'} 
+      textAnchor={textAnchor}
+      transform="rotate(10)"
+    >
+      {value} {width}x{height}
+    </text>
   );
 };
 
