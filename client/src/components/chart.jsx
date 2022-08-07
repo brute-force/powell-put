@@ -129,6 +129,7 @@ const Chart = () => {
         value={period}
         onChange={ handlePeriod }
         style={{ marginTop: 50 }}
+        fullWidth
       >
         <ToggleButton value="weeks">1 WEEK</ToggleButton>
         <ToggleButton value="months">1 MONTH</ToggleButton>
