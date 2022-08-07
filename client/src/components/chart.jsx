@@ -22,8 +22,10 @@ moment.defaultFormat = 'MM/DD/YY';
 const Chart = () => {
   const { ticker }  = useParams();
   const [period, setPeriod] = useState('');
+  const [periodStart, setPeriodStart] = useState('');
   const [priceStart, setPriceStart] = useState(0);
   const [priceEnd, setPriceEnd] = useState(0);
+  const [priceChange, setPriceChange] = useState(0);
   const [returnPct, setReturnPct] = useState(0);
   const [data, setData] = useState([]);
 
@@ -46,6 +48,8 @@ const Chart = () => {
         setPriceStart(formatMoney(quoteStart.close));
         setPriceEnd(formatMoney(quoteEnd.close));
         setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
+        setPeriodStart(moment(quoteStart.date).format());
+        setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
   
         setData(quotes.map((quote) => {
           let { date, ...other } = quote;
@@ -77,8 +81,8 @@ const Chart = () => {
       <table className="table table-bordered">
         <thead>
           <tr>
-            <th className="text-start">Start Price</th>
-            <th className="text-start">End Price</th>
+            <th className="text-start">Price ({ periodStart })</th>
+            <th className="text-start">Price (close)</th>
             <th className="text-start">Performance</th>
           </tr>
         </thead>
@@ -86,7 +90,7 @@ const Chart = () => {
           <tr>
             <td className="text-start">{ priceStart }</td>
             <td className="text-start">{ priceEnd }</td>
-            <td className="text-start">{ returnPct }%</td>
+            <td className="text-start">{ priceChange} ({ returnPct }%)</td>
           </tr>
         </tbody>
       </table>
@@ -95,22 +99,22 @@ const Chart = () => {
         exclusive
         value={period}
         onChange={ handlePeriod }
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 50 }}
       >
         <ToggleButton value="weeks">1 WEEK</ToggleButton>
         <ToggleButton value="months">1 MONTH</ToggleButton>
         <ToggleButton value="years">1 YEAR</ToggleButton>
         <ToggleButton value="">YTD</ToggleButton>
       </ToggleButtonGroup>
-      <ResponsiveContainer width="100%" height={350}>
+      <ResponsiveContainer width="100%" height={375}>
         <AreaChart
           // width={500}
           // height={500}
           data={data}
           margin={{
             top: 50,
-            right: 0,
-            left: 0,
+            right: 20,
+            left: 20,
             bottom: 0
           }}
         >
@@ -136,11 +140,8 @@ const Chart = () => {
           <YAxis
             dataKey="close" 
             interval="preserveStartEnd" 
-            domain={['auto', 'auto']}
-            // domain={['dataMin', 'dataMax']}
-            // domain={['dataMin - 10', 'dataMax + (dataMax * 0.1)']}
-            // domain={['dataMin - (dataMin * 0.1)', 'dataMax + (dataMax * 0.1)']}
-            // domain={[dataMin => (dataMin - (dataMin * 0.1)), dataMax => (dataMax + (dataMax * 0.1))]}
+            // domain={['auto', 'auto']}
+            domain={[dataMin => (dataMin * 0.88), dataMax => (Math.ceil(dataMax))]}
             tickMargin="10"
             style={{
               fontSize: '0.8rem',
@@ -148,7 +149,7 @@ const Chart = () => {
             tickFormatter={(value) => `$${toFixed(value, 2)}`}
           />
           <Tooltip
-            formatter={(value) => `$${toFixed(value, 2)} ${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%`}
+            formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
           />
           <Area
             type="monotone"
