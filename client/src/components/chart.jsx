@@ -134,9 +134,9 @@ const Chart = () => {
         style={{ marginTop: 50 }}
         fullWidth
       >
-        <ToggleButton value="weeks">1 WEEK</ToggleButton>
-        <ToggleButton value="months">1 MONTH</ToggleButton>
-        <ToggleButton value="years">1 YEAR</ToggleButton>
+        <ToggleButton value="weeks">1 W</ToggleButton>
+        <ToggleButton value="months">1 M</ToggleButton>
+        <ToggleButton value="years">1 Y</ToggleButton>
         <ToggleButton value="">YTD</ToggleButton>
       </ToggleButtonGroup>
       <ResponsiveContainer width="100%" height={375}>
