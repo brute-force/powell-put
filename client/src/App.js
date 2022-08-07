@@ -1,8 +1,6 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Stocks from './components/stocks';
 import Chart from './components/chart';
-// import "bootstrap/dist/css/bootstrap.css";
 
 function App() {
   return (
