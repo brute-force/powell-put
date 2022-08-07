@@ -11,6 +11,13 @@ import {
   ReferenceLine
 } from 'recharts';
 import { 
+  Stack,
+  Typography,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
   ToggleButton, 
   ToggleButtonGroup
 } from '@mui/material';
@@ -107,31 +114,37 @@ const Chart = () => {
   };
 
   return (
-    <div style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
-      <h3 className="text-start">{ ticker }</h3>
-      <h6 className="text-start">{ companyName }</h6>
-      <table className="table table-bordered" style={{  marginTop: 10 }}>
-        <thead>
-          <tr>
-            <th className="text-start" valign="top">Price ({ periodStart })</th>
-            <th className="text-start" valign="top">Price (close)</th>
-            <th className="text-start" valign="top">Performance</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="text-start">{ priceStart }</td>
-            <td className="text-start">{ priceEnd }</td>
-            <td className="text-start">{ returnPct }%</td>
-          </tr>
-        </tbody>
-      </table>
+    <Stack spacing={4}>
+      <Stack spacing={0}>
+        <Typography variant="h6" component="div">
+          { ticker.toUpperCase() }
+        </Typography>
+        <Typography variant="subtitle1" component="div">
+          { companyName }
+        </Typography>
+      </Stack>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>Price</TableCell>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>Price ({ periodStart })</TableCell>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>Performance</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>{ priceEnd }</TableCell>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>{ priceStart }</TableCell>
+            <TableCell align="left" style={{ verticalAlign: 'top' }}>{ returnPct }%</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
       <ToggleButtonGroup
         color="primary"
         exclusive
         value={period}
         onChange={ handlePeriod }
-        style={{ marginTop: 25, marginBottom: 20 }}
+        size="small"
         fullWidth
       >
         <ToggleButton value="weeks">1 W</ToggleButton>
@@ -215,20 +228,9 @@ const Chart = () => {
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </Stack>
   );
 };
-
-// eslint-disable-next-line react/prop-types
-const _CustomizedLabel = ({ value, viewBox: { x, y} }) => (
-  <g>
-    <foreignObject x={x-35} y={y-40} width={70} height={50}>
-      <div align="center" style={{ fontSize: '0.8rem' }}>
-        { value }
-      </div>
-    </foreignObject>
-  </g>
-);
 
 // eslint-disable-next-line react/prop-types
 const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
