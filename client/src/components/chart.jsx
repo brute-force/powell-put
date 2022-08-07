@@ -57,6 +57,7 @@ const Chart = () => {
   const [priceChange, setPriceChange] = useState(0);
   const [returnPct, setReturnPct] = useState(0);
   const [data, setData] = useState([]);
+  const [companyName, setCompanyName] = useState('');
 
   // console.log(`loading data: ${ticker}`);
 
@@ -79,6 +80,7 @@ const Chart = () => {
         setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
         setPeriodStart(moment(quoteStart.date).format());
         setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
+        setCompanyName(json.price.longName);
   
         setData(quotes.map((quote) => {
           let { date, ...other } = quote;
@@ -106,7 +108,8 @@ const Chart = () => {
 
   return (
     <div style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
-      <h3 className="text-start">{ ticker }</h3>
+      <h3 className="text-start">{ companyName }</h3>
+      <h4 className="text-start">{ ticker }</h4>
       <table className="table table-bordered">
         <thead>
           <tr>
@@ -194,11 +197,8 @@ const Chart = () => {
                     x={ meetingEnd }
                     stroke="green"
                     strokeDasharray="3 3"
-                    // label={{ value: `FOMC ${meetingEnd}`, position: 'top', fontSize: 15}}
-                    // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15 }}
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
-                    // label={ <CustomizedLabel value={`FOMC ${moment(meetingEnd).format('MM/DD')}`} /> }
-                    label={ <CustomizedLabel value={`${moment(meetingEnd).format('MM/DD')}`} /> }
+                    label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
                   />
                 );
               } else {
@@ -220,7 +220,7 @@ const Chart = () => {
 };
 
 // eslint-disable-next-line react/prop-types
-const _CustomizedLabel  = ({ value, viewBox: { x, y} }) => (
+const _CustomizedLabel = ({ value, viewBox: { x, y} }) => (
   <g>
     <foreignObject x={x-35} y={y-40} width={70} height={50}>
       <div align="center" style={{ fontSize: '0.8rem' }}>
@@ -234,13 +234,6 @@ const _CustomizedLabel  = ({ value, viewBox: { x, y} }) => (
 const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
   return (
     <g>
-      {/* <rect
-        x={ x - 35 }
-        y={ y - 40 }
-        fill="#aaa"
-        width={70}
-        height={50}
-      /> */}
       <text
         x={ x }
         y={ y }
@@ -249,30 +242,11 @@ const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
         dx={ -20 }
         textAnchor="start"
         transform={`rotate(-30,${x},${y})`}
+        style={{ fontSize: '0.8rem' }}
       >
         { value }
       </text>
     </g>
-  );
-};
-
-// eslint-disable-next-line react/prop-types
-const __CustomizedLabel = ({ fill, value, textAnchor, fontSize, viewBox: { width, height, x, y }, dx, dy }) => {
-  // const _x = width + x + 20;
-  // const _y = y - 6;
-
-  return (
-    <text 
-      x={width + x - 15} y={y - 6}
-      dy={dy}
-      dx={dx}
-      fill={fill}
-      fontSize={fontSize || '0.8rem'} 
-      textAnchor={textAnchor}
-      transform="rotate(10)"
-    >
-      {value} {width}x{height}
-    </text>
   );
 };
 

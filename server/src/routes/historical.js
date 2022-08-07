@@ -13,12 +13,37 @@ routerStocks.route('/historical').get(async (req, res) => {
   // console.log('periodStart', periodStart);
   
   try {
-    const response = await yF._chart(req.query.ticker, {
+    const result = await yF._chart(req.query.ticker, {
       period1: periodStart
     }); 
   
-    // console.log(response);
-    res.json(response);
+    // console.log(result);
+
+    let resultDetail = await yF.quoteSummary(req.query.ticker, { modules: ['price', 'summaryDetail', 'summaryProfile', 'defaultKeyStatistics']});
+
+    if (resultDetail) {
+      resultDetail = { 
+        price: {
+          longName = 'N/A',
+          regularMarketPrice: price
+        } = {},
+        summaryDetail: {
+          trailingPE,
+          forwardPE,
+          fiftyTwoWeekLow,
+          fiftyTwoWeekHigh
+        } = {},
+        summaryProfile: {
+          sector = 'N/A',
+          industry = 'N/A'
+        } = {},
+        defaultKeyStatistics: {
+          pegRatio = 'N/A'
+        } = {}
+      } = resultDetail;
+   }
+
+    res.json({ ...result, ...resultDetail });
   } catch(err) {
     console.log(req.params.ticker, err.message);
   }
