@@ -108,9 +108,9 @@ const Chart = () => {
 
   return (
     <div style={{ marginLeft: 20, marginRight: 20, marginTop: 20 }}>
-      <h3 className="text-start">{ companyName }</h3>
-      <h4 className="text-start">{ ticker }</h4>
-      <table className="table table-bordered">
+      <h3 className="text-start">{ ticker }</h3>
+      <h6 className="text-start">{ companyName }</h6>
+      <table className="table table-bordered" style={{  marginTop: 10 }}>
         <thead>
           <tr>
             <th className="text-start" valign="top">Price ({ periodStart })</th>
@@ -122,7 +122,7 @@ const Chart = () => {
           <tr>
             <td className="text-start">{ priceStart }</td>
             <td className="text-start">{ priceEnd }</td>
-            <td className="text-start">{ priceChange > 0 ? `+${priceChange}`: priceChange } ({ returnPct }%)</td>
+            <td className="text-start">{ returnPct }%</td>
           </tr>
         </tbody>
       </table>
@@ -131,7 +131,7 @@ const Chart = () => {
         exclusive
         value={period}
         onChange={ handlePeriod }
-        style={{ marginTop: 50 }}
+        style={{ marginTop: 25, marginBottom: 20 }}
         fullWidth
       >
         <ToggleButton value="weeks">1 W</ToggleButton>
@@ -139,7 +139,7 @@ const Chart = () => {
         <ToggleButton value="years">1 Y</ToggleButton>
         <ToggleButton value="">YTD</ToggleButton>
       </ToggleButtonGroup>
-      <ResponsiveContainer width="100%" height={375}>
+      <ResponsiveContainer width="100%" height={300}>
         <AreaChart
           // width={500}
           // height={500}
