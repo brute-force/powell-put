@@ -1,11 +1,8 @@
 const express = require('express');
 const routerStocks = express.Router();
 const yF = require('yahoo-finance2').default;
-const moment = require('moment');
 
 routerStocks.route('/historical').get(async (req, res) => {
-  const now = moment();
-
   try {
     const queryOptions = {
       period1: req.query.period1,
@@ -42,7 +39,9 @@ routerStocks.route('/historical').get(async (req, res) => {
 
     res.json({ ...result, ...resultDetail });
   } catch(err) {
-    console.log(req.params.ticker, err.message);
+    // console.log(req.params.ticker, err.message);
+    res.status(500);
+    res.json({ error: err.message });
   }
 });
 
