@@ -110,11 +110,11 @@ const Jerry = () => {
 
   let meeting = fomcMeetings.find((meeting) => moment(meeting.meetingStart, moment.defaultFormat).isSame(moment(periodStart, moment.defaultFormat)));
   let meetingInfo = meeting
-    ? <Stack spacing={1}>
-      <Typography variant="subtitle1" component="div">
+    ? <Stack spacing={0} style={{ marginTop: 10, marginBottom: 0 }}>
+      <Typography variant="subtitle2" component="div">
         FOMC Meeting { meeting.meetingStart } - { meeting.meetingEnd }
       </Typography>
-      <Typography variant="subtitle2" component="div">
+      <Typography variant="subtitle3" component="div">
         Notes: { meeting.notes }
       </Typography>
     </Stack>
