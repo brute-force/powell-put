@@ -5,7 +5,8 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(require('./routes/stocks'));
+app.use(require('./routes/search'));
+app.use(require('./routes/sp-500'));
 app.use(require('./routes/historical'));
 
 
