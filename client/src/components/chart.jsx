@@ -24,6 +24,7 @@ import {
 import { formatMoney, toFixed, unformat } from 'accounting';
 import moment from 'moment';
 import fomcMeetings from './fomc';
+import CustomizedLabel from './CustomizedLabel';
 
 moment.defaultFormat = 'MM/DD/YY';
 const now = moment();
@@ -187,8 +188,7 @@ const Chart = () => {
             formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2) > 0 ? `+${toFixed(value - unformat(priceStart), 2)}` : toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
           />
           {
-            // fomcMeetings.map((meeting) => <ReferenceLine key={ meeting.id } x={ meeting.meetingEnd } stroke="green" strokeDasharray="3 3" />)
-            fomcMeetings.map(({ id, meetingEnd}) => {
+            fomcMeetings.map(({ id, meetingStart, meetingEnd}) => {
               const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
               const mPeriodStart = moment(periodStart, moment.defaultFormat);
 
@@ -200,7 +200,7 @@ const Chart = () => {
                     stroke="green"
                     strokeDasharray="3 3"
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
-                    label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
+                    label={ <CustomizedLabel value={ { meetingStart, meetingEnd, ticker } } /> }
                   />
                 )
                 : '';
@@ -216,26 +216,6 @@ const Chart = () => {
         </AreaChart>
       </ResponsiveContainer>
     </Stack>
-  );
-};
-
-// eslint-disable-next-line react/prop-types
-const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
-  return (
-    <g>
-      <text
-        x={ x }
-        y={ y }
-        fill="#111"
-        dy={ -20 }
-        dx={ -20 }
-        textAnchor="start"
-        transform={`rotate(-30,${x},${y})`}
-        style={{ fontSize: '0.8rem' }}
-      >
-        { value }
-      </text>
-    </g>
   );
 };
 

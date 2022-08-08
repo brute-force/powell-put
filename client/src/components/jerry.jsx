@@ -19,11 +19,13 @@ import {
   TableRow,
   TableCell,
   ToggleButton, 
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Link
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
 import moment from 'moment';
 import fomcMeetings from './fomc';
+import CustomizedLabel from './CustomizedLabel';
 
 moment.defaultFormat = 'MM/DD/YY';
 const now = moment();
@@ -108,12 +110,12 @@ const Jerry = () => {
 
   let meeting = fomcMeetings.find((meeting) => moment(meeting.meetingStart, moment.defaultFormat).isSame(moment(periodStart, moment.defaultFormat)));
   let meetingInfo = meeting
-    ? <Stack spacing={0}>
-      <Typography variant="h6" component="div">
+    ? <Stack spacing={1}>
+      <Typography variant="subtitle1" component="div">
         FOMC Meeting { meeting.meetingStart } - { meeting.meetingEnd }
       </Typography>
-      <Typography variant="subtitle1" component="div">
-        { meeting.notes }
+      <Typography variant="subtitle2" component="div">
+        Notes: { meeting.notes }
       </Typography>
     </Stack>
     : '';
@@ -122,7 +124,9 @@ const Jerry = () => {
     <Stack spacing={4}>
       <Stack spacing={0}>
         <Typography variant="h6" component="div">
-          { ticker.toUpperCase() }
+          <Link href={ `/chart/${ticker}` } style={{ textDecoration: 'none' }}>
+            { ticker.toUpperCase() }
+          </Link>
         </Typography>
         <Typography variant="subtitle1" component="div">
           { companyName }
@@ -211,7 +215,7 @@ const Jerry = () => {
           />
           {
             // fomcMeetings.map((meeting) => <ReferenceLine key={ meeting.id } x={ meeting.meetingEnd } stroke="green" strokeDasharray="3 3" />)
-            fomcMeetings.map(({ id, meetingEnd}) => {
+            fomcMeetings.map(({ id, meetingStart, meetingEnd}) => {
               const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
               const mPeriodStart = moment(periodStart, moment.defaultFormat);
               
@@ -223,7 +227,8 @@ const Jerry = () => {
                     stroke="green"
                     strokeDasharray="3 3"
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
-                    label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
+                    // label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
+                    label={ <CustomizedLabel value={ { meetingStart, meetingEnd, ticker } } /> }
                   />
                 );
               } else {
@@ -241,26 +246,6 @@ const Jerry = () => {
         </AreaChart>
       </ResponsiveContainer>
     </Stack>
-  );
-};
-
-// eslint-disable-next-line react/prop-types
-const CustomizedLabel = ({ viewBox: { x, y, width, height }, value }) => {
-  return (
-    <g>
-      <text
-        x={ x }
-        y={ y }
-        fill="#111"
-        dy={ -20 }
-        dx={ -20 }
-        textAnchor="start"
-        transform={`rotate(-30,${x},${y})`}
-        style={{ fontSize: '0.8rem' }}
-      >
-        { value }
-      </text>
-    </g>
   );
 };
 
