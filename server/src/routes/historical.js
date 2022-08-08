@@ -6,17 +6,14 @@ const moment = require('moment');
 routerStocks.route('/historical').get(async (req, res) => {
   const now = moment();
 
-  let periodStart = req.query.period.length > 0 
-    ? now.clone().subtract(1, req.query.period).format()
-    : now.clone().startOf('year').format();
-
-  // console.log('periodStart', periodStart);
-  
   try {
-    const result = await yF._chart(req.query.ticker, {
-      period1: periodStart
-    }); 
-  
+    const queryOptions = {
+      period1: req.query.period1,
+      period2: req.query.period2
+    };
+
+    // console.log(queryOptions);
+    const result = await yF._chart(req.query.ticker, queryOptions);
     // console.log(result);
 
     let resultDetail = await yF.quoteSummary(req.query.ticker, { modules: ['price', 'summaryDetail', 'summaryProfile', 'defaultKeyStatistics']});
