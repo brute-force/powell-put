@@ -23,45 +23,37 @@ import {
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
 import moment from 'moment';
+import fomcMeetings from './fomc';
 
-// moment.defaultFormat = 'YYYY-MM-DD';
 moment.defaultFormat = 'MM/DD/YY';
+const now = moment();
+
+const toggleButtons = [
+  {
+    label: '1 W',
+    value: now.clone().subtract(1, 'weeks').format()
+  },
+  {
+    label: '1 M',
+    value: now.clone().subtract(1, 'months').format()
+  },
+  {
+    label: '1 Y',
+    value: now.clone().subtract(1, 'years').format()
+  },
+  {
+    label: 'YTD',
+    value: now.clone().startOf('year').format()
+  }
+];
 
 const Chart = () => {
-  const fomcMeetings = [
-    {
-      id: 1,
-      meetingStart: '01/25/22',
-      meetingEnd: '01/26/22'
-    },
-    {
-      id: 2,
-      meetingStart: '03/15/22',
-      meetingEnd: '03/16/22'
-    },
-    {
-      id: 3,
-      meetingStart: '05/03/22',
-      meetingEnd: '05/04/22'
-    },
-    {
-      id: 4,
-      meetingStart: '06/14/22',
-      meetingEnd: '06/15/22'
-    },
-    {
-      id: 5,
-      meetingStart: '07/26/22',
-      meetingEnd: '07/27/22'
-    },
-  ];
-
   const { ticker }  = useParams();
-  const [period, setPeriod] = useState('');
+  const [period1, setPeriod1] = useState(now.clone().startOf('year').format());
   const [periodStart, setPeriodStart] = useState('');
   const [priceStart, setPriceStart] = useState(0);
   const [priceEnd, setPriceEnd] = useState(0);
-  const [priceChange, setPriceChange] = useState(0);
+  // const [priceChange, setPriceChange] = useState(0);
   const [returnPct, setReturnPct] = useState(0);
   const [data, setData] = useState([]);
   const [companyName, setCompanyName] = useState('');
@@ -75,8 +67,8 @@ const Chart = () => {
           ? `http://192.168.1.62:${process.env.REACT_APP_API_PORT}/historical`
           : '/historical';
 
-        const response = await fetch(`${feed}?ticker=${ticker}&period=${period}`);
- 
+        const response = await fetch(`${feed}?ticker=${ticker}&period1=${period1}`);
+
         const json = await response.json();
         const quotes = json.quotes;
         const quoteStart = quotes[0];
@@ -85,8 +77,8 @@ const Chart = () => {
         setPriceStart(formatMoney(quoteStart.close));
         setPriceEnd(formatMoney(quoteEnd.close));
         setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
-        setPeriodStart(moment(quoteStart.date).format());
-        setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
+        setPeriodStart(moment(quoteStart.date).format()); // actual periods are interpolated to closest tradings days
+        // setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
         setCompanyName(json.price.longName);
   
         setData(quotes.map((quote) => {
@@ -94,12 +86,9 @@ const Chart = () => {
   
           return {
             date: moment(date).format(),
-            // date: moment.utc(date).valueOf(),
             ...other
           };
-  
         }));
-        // setData(quotes.map((quote) => ({ date: moment(quote.date).format(), ...rest}));
       } catch(err) {
         console.log(err.message);
         alert(err.message);
@@ -107,10 +96,10 @@ const Chart = () => {
     };
 
     getHistoricalData();
-  }, [ticker, period]);
+  }, [ticker, period1]);
 
-  const handlePeriod = (event, period) => {
-    setPeriod(period);
+  const handlePeriod1 = (event) => {
+    setPeriod1(event.target.value);
   };
 
   return (
@@ -135,6 +124,7 @@ const Chart = () => {
           <TableRow>
             <TableCell align="left" style={{ verticalAlign: 'top' }}>{ priceEnd }</TableCell>
             <TableCell align="left" style={{ verticalAlign: 'top' }}>{ priceStart }</TableCell>
+            {/* <TableCell align="left" style={{ verticalAlign: 'top' }}>{priceChange > 0 ? `+` :''}{ priceChange } { returnPct }%</TableCell> */}
             <TableCell align="left" style={{ verticalAlign: 'top' }}>{ returnPct }%</TableCell>
           </TableRow>
         </TableBody>
@@ -142,15 +132,14 @@ const Chart = () => {
       <ToggleButtonGroup
         color="primary"
         exclusive
-        value={period}
-        onChange={ handlePeriod }
+        value={ period1 }
+        onChange={ handlePeriod1 }
         size="small"
         fullWidth
       >
-        <ToggleButton value="weeks">1 W</ToggleButton>
-        <ToggleButton value="months">1 M</ToggleButton>
-        <ToggleButton value="years">1 Y</ToggleButton>
-        <ToggleButton value="">YTD</ToggleButton>
+        {
+          toggleButtons.map((toggleButton) => <ToggleButton key={ toggleButton.value } value={ toggleButton.value }>{ toggleButton.label }</ToggleButton>)
+        }
       </ToggleButtonGroup>
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart
@@ -202,9 +191,9 @@ const Chart = () => {
             fomcMeetings.map(({ id, meetingEnd}) => {
               const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
               const mPeriodStart = moment(periodStart, moment.defaultFormat);
-              
-              if (mMeetingEnd.isAfter(mPeriodStart) && mMeetingEnd.isBefore(moment())) {
-                return (
+
+              return mMeetingEnd.isAfter(mPeriodStart) && mMeetingEnd.isBefore(moment())
+                ? (
                   <ReferenceLine 
                     key={ id }
                     x={ meetingEnd }
@@ -213,10 +202,8 @@ const Chart = () => {
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
                     label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
                   />
-                );
-              } else {
-                return '';
-              }
+                )
+                : '';
             })
           }
           <Area
