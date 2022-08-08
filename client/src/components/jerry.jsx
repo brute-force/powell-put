@@ -24,12 +24,12 @@ import {
   Popover
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
-import moment from 'moment';
 import fomcMeetings from './fomc';
 import CustomizedLabel from './CustomizedLabel';
+import { DateTime } from 'luxon';
 
-moment.defaultFormat = 'MM/DD/YY';
-const now = moment();
+const defaultDateFormat = 'MM/dd/yy';
+const now = DateTime.now();
 
 const Jerry = () => {
   const { ticker }  = useParams();
@@ -47,19 +47,19 @@ const Jerry = () => {
   const toggleButtons = [
     {
       label: '1 D AFTER',
-      value: moment(searchParams.get('period1'), moment.defaultFormat).add(2, 'days').format()
+      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ days: 2 }).toFormat(defaultDateFormat)
     },
     {
       label: '1 W AFTER',
-      value: moment(searchParams.get('period1'), moment.defaultFormat).add(1, 'weeks').format()
+      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ weeks: 1 }).toFormat(defaultDateFormat)
     },
     {
       label: '1 M AFTER',
-      value: moment(searchParams.get('period1'), moment.defaultFormat).add(1, 'months').format()
+      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ months: 1 }).toFormat(defaultDateFormat)
     },
     {
       label: 'TODAY',
-      value: now.format()
+      value: now.toFormat(defaultDateFormat)
     }
   ];
   
@@ -83,8 +83,9 @@ const Jerry = () => {
         setPriceEnd(formatMoney(quoteEnd.close));
         setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
         // actual periods are interpolated to closest tradings days
-        setPeriodStart(moment(quoteStart.date).format()); 
-        setPeriodEnd(moment(quoteEnd.date).format());
+
+        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(defaultDateFormat));
+        setPeriodEnd(DateTime.fromISO(quoteEnd.date).toFormat(defaultDateFormat));
         // setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
         setCompanyName(json.price.longName);
   
@@ -92,7 +93,7 @@ const Jerry = () => {
           let { date, ...other } = quote;
   
           return {
-            date: moment(date).format(),
+            date: DateTime.fromISO(date).toFormat('MM/dd/yy'),
             ...other
           };
         }));
@@ -121,7 +122,7 @@ const Jerry = () => {
   const open = Boolean(fomcNotesPopoverAnchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  let meeting = fomcMeetings.find((meeting) => moment(meeting.meetingStart, moment.defaultFormat).isSame(moment(periodStart, moment.defaultFormat)));
+  let meeting = fomcMeetings.find((meeting) => DateTime.fromFormat(meeting.meetingStart, defaultDateFormat) === DateTime.fromFormat(periodStart, defaultDateFormat));
   let meetingInfo = meeting
     ? <Stack spacing={0} style={{ marginTop: 5, marginBottom: 0 }}>
       <Typography variant="subtitle2" component="div" onClick={ handleFomcNotesPopoverClick }>
@@ -183,7 +184,7 @@ const Jerry = () => {
       >
         {
           toggleButtons.map((toggleButton) => {
-            return moment(toggleButton.value, moment.defaultFormat).isBefore(now)
+            return DateTime.fromFormat(toggleButton.value, defaultDateFormat) < now
               ? (
                 <ToggleButton key={ toggleButton.value } value={ toggleButton.value }>{ toggleButton.label }</ToggleButton>
               )
@@ -237,26 +238,25 @@ const Jerry = () => {
             formatter={(value) => `$${toFixed(value, 2)} ${toFixed(value - unformat(priceStart), 2) > 0 ? `+${toFixed(value - unformat(priceStart), 2)}` : toFixed(value - unformat(priceStart), 2)} (${toFixed((value/unformat(priceStart) - 1) * 100, 2)}%)`}
           />
           {
-            // fomcMeetings.map((meeting) => <ReferenceLine key={ meeting.id } x={ meeting.meetingEnd } stroke="green" strokeDasharray="3 3" />)
             fomcMeetings.map(({ id, meetingStart, meetingEnd}) => {
-              const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
-              const mPeriodStart = moment(periodStart, moment.defaultFormat);
-              
-              if (mMeetingEnd.isAfter(mPeriodStart) && mMeetingEnd.isBefore(moment())) {
-                return (
+              const dtMeetingEnd = DateTime.fromFormat(meetingEnd, defaultDateFormat);
+              const dtMeetingStart = DateTime.fromFormat(meetingStart, defaultDateFormat);
+              // default end period for fed chart is 2 days after meeting start
+              const meetingEndTrimmed = dtMeetingEnd.toFormat('MM/dd');
+              const period2 = dtMeetingStart.plus({ years: 1 }).toFormat(defaultDateFormat);
+
+              return dtMeetingEnd > dtMeetingStart && dtMeetingEnd < DateTime.now()
+                ? (
                   <ReferenceLine 
                     key={ id }
                     x={ meetingEnd }
                     stroke="green"
                     strokeDasharray="3 3"
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
-                    // label={ <CustomizedLabel value={`${mMeetingEnd.format('MM/DD')}`} /> }
-                    label={ <CustomizedLabel value={ { meetingStart, meetingEnd, ticker } } /> }
+                    label={ <CustomizedLabel value={ { meetingStart, meetingEndTrimmed, period2, ticker } } /> }
                   />
-                );
-              } else {
-                return '';
-              }
+                )
+                : '';
             })
           }
           <Area

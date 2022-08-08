@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,39 +23,40 @@ import {
   Link
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
-import moment from 'moment';
 import fomcMeetings from './fomc';
 import CustomizedLabel from './CustomizedLabel';
+import { DateTime } from 'luxon';
 
-moment.defaultFormat = 'MM/DD/YY';
-const now = moment();
+const defaultDateFormat = 'MM/dd/yy';
+const now = DateTime.now();
 
 const toggleButtons = [
   {
     label: '1 W',
-    value: now.clone().subtract(1, 'weeks').format()
+    value: now.minus({ weeks: 1 }).toFormat(defaultDateFormat)
   },
   {
     label: '1 M',
-    value: now.clone().subtract(1, 'months').format()
+    value: now.minus({ months: 1 }).toFormat(defaultDateFormat)
   },
   {
     label: '1 Y',
-    value: now.clone().subtract(1, 'years').format()
+    value: now.minus({ years: 1 }).toFormat(defaultDateFormat)
   },
   {
     label: 'YTD',
-    value: now.clone().startOf('year').format()
+    value: now.startOf('year').toFormat(defaultDateFormat)
   }
 ];
 
 const Chart = () => {
+  const navigate = useNavigate();
+
   const { ticker }  = useParams();
-  const [period1, setPeriod1] = useState(now.clone().startOf('year').format());
+  const [period1, setPeriod1] = useState(now.startOf('year').toFormat(defaultDateFormat));
   const [periodStart, setPeriodStart] = useState('');
   const [priceStart, setPriceStart] = useState(0);
   const [priceEnd, setPriceEnd] = useState(0);
-  // const [priceChange, setPriceChange] = useState(0);
   const [returnPct, setReturnPct] = useState(0);
   const [data, setData] = useState([]);
   const [companyName, setCompanyName] = useState('');
@@ -70,16 +71,16 @@ const Chart = () => {
           : '/historical';
 
         const response = await fetch(`${feed}?ticker=${ticker}&period1=${period1}`);
-
         const json = await response.json();
         const quotes = json.quotes;
         const quoteStart = quotes[0];
         const quoteEnd = quotes[quotes.length - 1];
-  
+
         setPriceStart(formatMoney(quoteStart.close));
         setPriceEnd(formatMoney(quoteEnd.close));
         setReturnPct(toFixed((quoteEnd.close/quoteStart.close - 1) * 100, 2));
-        setPeriodStart(moment(quoteStart.date).format()); // actual periods are interpolated to closest tradings days
+        // actual periods are interpolated to closest tradings days
+        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(defaultDateFormat));
         // setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
         setCompanyName(json.price.longName);
   
@@ -87,18 +88,19 @@ const Chart = () => {
           let { date, ...other } = quote;
   
           return {
-            date: moment(date).format(),
+            date: DateTime.fromISO(date).toFormat('MM/dd/yy'),
             ...other
           };
         }));
       } catch(err) {
         console.log(err.message);
-        alert(err.message);
+        alert(`${ticker} not found`);
+        navigate('/');
       }
     };
 
     getHistoricalData();
-  }, [ticker, period1]);
+  }, [ticker, period1, navigate]);
 
   const handlePeriod1 = (event) => {
     setPeriod1(event.target.value);
@@ -190,10 +192,13 @@ const Chart = () => {
           />
           {
             fomcMeetings.map(({ id, meetingStart, meetingEnd}) => {
-              const mMeetingEnd = moment(meetingEnd, moment.defaultFormat);
-              const mPeriodStart = moment(periodStart, moment.defaultFormat);
+              const dtMeetingEnd = DateTime.fromFormat(meetingEnd, defaultDateFormat);
+              const dtMeetingStart = DateTime.fromFormat(meetingStart, defaultDateFormat);
+              // default end period for fed chart is 2 days after meeting start
+              const meetingEndTrimmed = dtMeetingEnd.toFormat('MM/dd');
+              const period2 = dtMeetingStart.plus({ years: 1 }).toFormat(defaultDateFormat);
 
-              return mMeetingEnd.isAfter(mPeriodStart) && mMeetingEnd.isBefore(moment())
+              return dtMeetingEnd > dtMeetingStart && dtMeetingEnd < DateTime.now()
                 ? (
                   <ReferenceLine 
                     key={ id }
@@ -201,7 +206,7 @@ const Chart = () => {
                     stroke="green"
                     strokeDasharray="3 3"
                     // label={{ value: `${moment(meetingEnd).format('MM/DD')}`, position: 'top', fontSize: 15, angle:"-45" }}
-                    label={ <CustomizedLabel value={ { meetingStart, meetingEnd, ticker } } /> }
+                    label={ <CustomizedLabel value={ { meetingStart, meetingEndTrimmed, period2, ticker } } /> }
                   />
                 )
                 : '';
