@@ -122,7 +122,8 @@ const Jerry = () => {
   const open = Boolean(fomcNotesPopoverAnchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  let meeting = fomcMeetings.find((meeting) => DateTime.fromFormat(meeting.meetingStart, defaultDateFormat) === DateTime.fromFormat(periodStart, defaultDateFormat));
+  // let meeting = fomcMeetings.find((meeting) => DateTime.fromFormat(meeting.meetingStart, defaultDateFormat).hasSame(DateTime.fromFormat(periodStart, defaultDateFormat), 'day'));
+  let meeting = fomcMeetings.find((meeting) => meeting.meetingStart === periodStart);
   let meetingInfo = meeting
     ? <Stack spacing={0} style={{ marginTop: 5, marginBottom: 0 }}>
       <Typography variant="subtitle2" component="div" onClick={ handleFomcNotesPopoverClick }>
@@ -243,7 +244,7 @@ const Jerry = () => {
               const dtMeetingStart = DateTime.fromFormat(meetingStart, defaultDateFormat);
               // default end period for fed chart is 2 days after meeting start
               const meetingEndTrimmed = dtMeetingEnd.toFormat('MM/dd');
-              const period2 = dtMeetingStart.plus({ years: 1 }).toFormat(defaultDateFormat);
+              const period2 = dtMeetingStart.plus({ days: 2 }).toFormat(defaultDateFormat);
 
               return dtMeetingEnd > dtMeetingStart && dtMeetingEnd < DateTime.now()
                 ? (

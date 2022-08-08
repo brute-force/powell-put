@@ -196,7 +196,7 @@ const Chart = () => {
               const dtMeetingStart = DateTime.fromFormat(meetingStart, defaultDateFormat);
               // default end period for fed chart is 2 days after meeting start
               const meetingEndTrimmed = dtMeetingEnd.toFormat('MM/dd');
-              const period2 = dtMeetingStart.plus({ years: 1 }).toFormat(defaultDateFormat);
+              const period2 = dtMeetingStart.plus({ days: 2 }).toFormat(defaultDateFormat);
 
               return dtMeetingEnd > dtMeetingStart && dtMeetingEnd < DateTime.now()
                 ? (
