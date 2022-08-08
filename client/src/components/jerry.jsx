@@ -124,8 +124,9 @@ const Jerry = () => {
     <Stack spacing={4}>
       <Stack spacing={0}>
         <Typography variant="h6" component="div">
+          <Link href="/" style={{ textDecoration: 'none' }}>&gt;</Link> 
           <Link href={ `/chart/${ticker}` } style={{ textDecoration: 'none' }}>
-            { ticker.toUpperCase() }
+            &nbsp;{ ticker.toUpperCase() }
           </Link>
         </Typography>
         <Typography variant="subtitle1" component="div">

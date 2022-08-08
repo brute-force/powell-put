@@ -19,7 +19,8 @@ import {
   TableRow,
   TableCell,
   ToggleButton, 
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Link
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
 import moment from 'moment';
@@ -107,7 +108,7 @@ const Chart = () => {
     <Stack spacing={4}>
       <Stack spacing={0}>
         <Typography variant="h6" component="div">
-          { ticker.toUpperCase() }
+          <Link href="/" style={{ textDecoration: 'none' }}>&gt;</Link> { ticker.toUpperCase() }
         </Typography>
         <Typography variant="subtitle1" component="div">
           { companyName }
