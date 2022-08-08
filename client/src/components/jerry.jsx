@@ -20,7 +20,8 @@ import {
   TableCell,
   ToggleButton, 
   ToggleButtonGroup,
-  Link
+  Link,
+  Popover
 } from '@mui/material';
 import { formatMoney, toFixed, unformat } from 'accounting';
 import moment from 'moment';
@@ -41,6 +42,7 @@ const Jerry = () => {
   const [returnPct, setReturnPct] = useState(0);
   const [data, setData] = useState([]);
   const [companyName, setCompanyName] = useState('');
+  const [fomcNotesPopoverAnchorEl, setFomcNotesPopoverAnchorEl] = useState(null);
 
   const toggleButtons = [
     {
@@ -108,15 +110,35 @@ const Jerry = () => {
     setSearchParams(searchParams);
   };
 
+  const handleFomcNotesPopoverClick = (event) => {
+    setFomcNotesPopoverAnchorEl(event.currentTarget);
+  };
+
+  const handleFomcNotesPopoverClose = () => {
+    setFomcNotesPopoverAnchorEl(null);
+  };
+
+  const open = Boolean(fomcNotesPopoverAnchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   let meeting = fomcMeetings.find((meeting) => moment(meeting.meetingStart, moment.defaultFormat).isSame(moment(periodStart, moment.defaultFormat)));
   let meetingInfo = meeting
-    ? <Stack spacing={0} style={{ marginTop: 10, marginBottom: 0 }}>
-      <Typography variant="subtitle2" component="div">
+    ? <Stack spacing={0} style={{ marginTop: 5, marginBottom: 0 }}>
+      <Typography variant="subtitle2" component="div" onClick={ handleFomcNotesPopoverClick }>
         FOMC Meeting { meeting.meetingStart } - { meeting.meetingEnd }
       </Typography>
-      <Typography variant="subtitle3" component="div">
-        Notes: { meeting.notes }
-      </Typography>
+      <Popover
+        id={ id }
+        open={ open }
+        anchorEl={ fomcNotesPopoverAnchorEl }
+        onClose={ handleFomcNotesPopoverClose }
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Typography sx={{ p: 2 }}>Notes: { meeting.notes}</Typography>
+      </Popover>
     </Stack>
     : '';
 
@@ -134,7 +156,7 @@ const Jerry = () => {
         </Typography>
       </Stack>
       { meetingInfo }
-      <Table size="small">
+      <Table size="small" style={{ marginTop: 10, marginBottom: 0 }}>
         <TableHead>
           <TableRow>
             <TableCell align="left" style={{ verticalAlign: 'top' }}>Price ({ periodEnd })</TableCell>
