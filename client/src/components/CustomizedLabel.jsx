@@ -1,8 +1,7 @@
+import PropTypes from 'prop-types';
 import { Link } from '@mui/material';
 
-// eslint-disable-next-line react/prop-types
 const CustomizedLabel = ({ viewBox: { x, y, width, height }, value: { meetingStart, meetingEndTrimmed, period2, ticker} }) => {
-  
   return (
     <g>
       <Link href={ `/jerry/${ticker}?period1=${ meetingStart }&period2=${period2}` }>
@@ -23,5 +22,21 @@ const CustomizedLabel = ({ viewBox: { x, y, width, height }, value: { meetingSta
   );
 };
 
+CustomizedLabel.propTypes = {
+  viewBox: PropTypes.exact({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired
+  }),
+  value: PropTypes.exact({
+    meetingStart: PropTypes.string.isRequired,
+    meetingEndTrimmed: PropTypes.string.isRequired,
+    period2: PropTypes.string.isRequired,
+    ticker: PropTypes.string.isRequired
+  }),
+};
+
+
 export default CustomizedLabel;
-// 
+
