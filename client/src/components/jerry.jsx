@@ -164,13 +164,9 @@ const Jerry = () => {
         fullWidth
       >
         {
-          toggleButtons.map((toggleButton) => {
-            return DateTime.fromFormat(toggleButton.value, defaultDateFormat) < now
-              ? (
-                <ToggleButton key={ toggleButton.value } value={ toggleButton.value }>{ toggleButton.label }</ToggleButton>
-              )
-              : '';
-          })
+          toggleButtons
+            .filter((toggleButton) => DateTime.fromFormat(toggleButton.value, defaultDateFormat) < now)
+            .map((toggleButton) => <ToggleButton key={ toggleButton.value } value={ toggleButton.value }>{ toggleButton.label }</ToggleButton>)
         }
       </ToggleButtonGroup>
       <ChartComponent
