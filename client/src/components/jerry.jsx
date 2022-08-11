@@ -4,16 +4,17 @@ import {
 } from '@mui/material';
 import { formatMoney, toFixed } from 'accounting';
 import { DateTime } from 'luxon';
+import { useContext } from 'react';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { ChartContext } from '../contexts/ChartContext';
 import ChartComponent from './ChartComponent';
-import fomcMeetings from './fomc';
 
-const defaultDateFormat = 'MM/dd/yy';
 const now = DateTime.now();
 
 const Jerry = () => {
   const { ticker }  = useParams();
+  const { dateFormatDefault, fomcMeetings } = useContext(ChartContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const [periodStart, setPeriodStart] = useState('');
   const [periodEnd, setPeriodEnd] = useState('');
@@ -28,19 +29,19 @@ const Jerry = () => {
   const toggleButtons = [
     {
       label: '1 D AFTER',
-      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ days: 2 }).toFormat(defaultDateFormat)
+      value: DateTime.fromFormat(searchParams.get('period1'), dateFormatDefault).plus({ days: 2 }).toFormat(dateFormatDefault)
     },
     {
       label: '1 W AFTER',
-      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ weeks: 1 }).toFormat(defaultDateFormat)
+      value: DateTime.fromFormat(searchParams.get('period1'), dateFormatDefault).plus({ weeks: 1 }).toFormat(dateFormatDefault)
     },
     {
       label: '1 M AFTER',
-      value: DateTime.fromFormat(searchParams.get('period1'), defaultDateFormat).plus({ months: 1 }).toFormat(defaultDateFormat)
+      value: DateTime.fromFormat(searchParams.get('period1'), dateFormatDefault).plus({ months: 1 }).toFormat(dateFormatDefault)
     },
     {
       label: 'TODAY',
-      value: now.toFormat(defaultDateFormat)
+      value: now.toFormat(dateFormatDefault)
     }
   ];
   
@@ -64,8 +65,8 @@ const Jerry = () => {
         setPriceEnd(quoteEnd.close);
         setReturnPct((quoteEnd.close/quoteStart.close - 1) * 100);
         // actual periods are interpolated to closest tradings days
-        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(defaultDateFormat));
-        setPeriodEnd(DateTime.fromISO(quoteEnd.date).toFormat(defaultDateFormat));
+        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(dateFormatDefault));
+        setPeriodEnd(DateTime.fromISO(quoteEnd.date).toFormat(dateFormatDefault));
         // setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
         setCompanyName(json.price.longName);
   
@@ -102,7 +103,7 @@ const Jerry = () => {
   const open = Boolean(fomcNotesPopoverAnchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  // let meeting = fomcMeetings.find((meeting) => DateTime.fromFormat(meeting.meetingStart, defaultDateFormat).hasSame(DateTime.fromFormat(periodStart, defaultDateFormat), 'day'));
+  // let meeting = fomcMeetings.find((meeting) => DateTime.fromFormat(meeting.meetingStart, dateFormatDefault).hasSame(DateTime.fromFormat(periodStart, dateFormatDefault), 'day'));
   let meeting = fomcMeetings.find((meeting) => meeting.meetingStart === periodStart);
   let meetingInfo = meeting
     ? <Stack spacing={0} style={{ marginTop: 5, marginBottom: 0 }}>
@@ -165,7 +166,7 @@ const Jerry = () => {
       >
         {
           toggleButtons
-            .filter((toggleButton) => DateTime.fromFormat(toggleButton.value, defaultDateFormat) < now)
+            .filter((toggleButton) => DateTime.fromFormat(toggleButton.value, dateFormatDefault) < now)
             .map((toggleButton) => <ToggleButton key={ toggleButton.value } value={ toggleButton.value }>{ toggleButton.label }</ToggleButton>)
         }
       </ToggleButtonGroup>
@@ -174,7 +175,7 @@ const Jerry = () => {
         data={ data }
         priceStart={ priceStart }
         returnPct={ returnPct }
-        defaultDateFormat={ defaultDateFormat }
+        dateFormatDefault={ dateFormatDefault }
       />
     </Stack>
   );

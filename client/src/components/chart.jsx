@@ -4,18 +4,21 @@ import {
 } from '@mui/material';
 import { formatMoney, toFixed } from 'accounting';
 import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ChartContext } from '../contexts/ChartContext';
 import ChartComponent from './ChartComponent';
 
-const defaultDateFormat = 'MM/dd/yy';
+// const dateFormatDefault = 'MM/dd/yy';
 const now = DateTime.now();
 
 const Chart = () => {
+  const { dateFormatDefault } = useContext(ChartContext);
+
   const navigate = useNavigate();
 
   const { ticker }  = useParams();
-  const [period1, setPeriod1] = useState(now.startOf('year').toFormat(defaultDateFormat));
+  const [period1, setPeriod1] = useState(now.startOf('year').toFormat(dateFormatDefault));
   const [periodStart, setPeriodStart] = useState('');
   const [priceStart, setPriceStart] = useState(0);
   const [priceEnd, setPriceEnd] = useState(0);
@@ -26,19 +29,19 @@ const Chart = () => {
   const toggleButtons = [
     {
       label: '1 W',
-      value: now.minus({ weeks: 1 }).toFormat(defaultDateFormat)
+      value: now.minus({ weeks: 1 }).toFormat(dateFormatDefault)
     },
     {
       label: '1 M',
-      value: now.minus({ months: 1 }).toFormat(defaultDateFormat)
+      value: now.minus({ months: 1 }).toFormat(dateFormatDefault)
     },
     {
       label: '1 Y',
-      value: now.minus({ years: 1 }).toFormat(defaultDateFormat)
+      value: now.minus({ years: 1 }).toFormat(dateFormatDefault)
     },
     {
       label: 'YTD',
-      value: now.startOf('year').toFormat(defaultDateFormat)
+      value: now.startOf('year').toFormat(dateFormatDefault)
     }
   ];
 
@@ -61,7 +64,7 @@ const Chart = () => {
         setPriceEnd(quoteEnd.close);
         setReturnPct((quoteEnd.close/quoteStart.close - 1) * 100);
         // actual periods are interpolated to closest tradings days
-        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(defaultDateFormat));
+        setPeriodStart(DateTime.fromISO(quoteStart.date).toFormat(dateFormatDefault));
         // setPriceChange(toFixed(quoteEnd.close - quoteStart.close, 2));
         setCompanyName(json.price.longName);
 
@@ -81,7 +84,7 @@ const Chart = () => {
     };
 
     getHistoricalData();
-  }, [ticker, period1, navigate]);
+  }, [ticker, period1, dateFormatDefault, navigate]);
 
   const handlePeriod1 = (event) => {
     setPeriod1(event.target.value);
@@ -131,7 +134,7 @@ const Chart = () => {
         data={ data }
         priceStart={ priceStart }
         returnPct={ returnPct }
-        defaultDateFormat={ defaultDateFormat }
+        dateFormatDefault={ dateFormatDefault }
       />
     </Stack>
   );

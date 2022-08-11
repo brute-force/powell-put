@@ -1,13 +1,16 @@
 import { toFixed } from 'accounting';
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
+import { useContext } from 'react';
 import {
   Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis
 } from 'recharts';
+import { ChartContext } from '../contexts/ChartContext';
 import CustomizedLabel from './CustomizedLabel';
-import fomcMeetings from './fomc';
+// import fomcMeetings from './fomc';
 
-const ChartComponent = ({ ticker, data, priceStart, returnPct, defaultDateFormat}) => {
+const ChartComponent = ({ ticker, data, priceStart, returnPct, dateFormatDefault}) => {
+  const { dateFormatShort, fomcMeetings } = useContext(ChartContext);
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart
@@ -56,11 +59,11 @@ const ChartComponent = ({ ticker, data, priceStart, returnPct, defaultDateFormat
         />
         {
           fomcMeetings.map(({ id, meetingStart, meetingEnd}) => {
-            const dtMeetingEnd = DateTime.fromFormat(meetingEnd, defaultDateFormat);
-            const dtMeetingStart = DateTime.fromFormat(meetingStart, defaultDateFormat);
+            const dtMeetingEnd = DateTime.fromFormat(meetingEnd, dateFormatDefault);
+            const dtMeetingStart = DateTime.fromFormat(meetingStart, dateFormatDefault);
             // default end period for fed chart is 2 days after meeting start
-            const meetingEndTrimmed = dtMeetingEnd.toFormat('MM/dd');
-            const period2 = dtMeetingStart.plus({ days: 2 }).toFormat(defaultDateFormat);
+            const meetingEndTrimmed = dtMeetingEnd.toFormat(dateFormatShort);
+            const period2 = dtMeetingStart.plus({ days: 2 }).toFormat(dateFormatDefault);
 
             return dtMeetingEnd > dtMeetingStart && dtMeetingEnd < DateTime.now()
               ? (
@@ -93,7 +96,7 @@ ChartComponent.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   priceStart: PropTypes.number.isRequired,
   returnPct: PropTypes.number.isRequired,
-  defaultDateFormat: PropTypes.string.isRequired
+  dateFormatDefault: PropTypes.string.isRequired
 };
 
 export default ChartComponent;
