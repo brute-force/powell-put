@@ -1,53 +1,52 @@
 const express = require('express');
-const routerStocks = express.Router();
 const yF = require('yahoo-finance2').default;
+const dbo = require('../db/conn');
 
-routerStocks.route('/historical').get(async (req, res) => {
+const routerStocks = express.Router();
+
+routerStocks.route('/historical').get(async ({ query }, res) => {
   try {
     const queryOptions = {
-      period1: req.query.period1,
-      period2: req.query.period2
+      period1: query.period1,
+      period2: query.period2
     };
 
     // console.log(queryOptions);
-    const result = await yF._chart(req.query.ticker, queryOptions);
+    // eslint-disable-next-line no-underscore-dangle
+    const result = await yF._chart(query.ticker, queryOptions);
     // console.log(result);
 
-    let resultDetail = await yF.quoteSummary(req.query.ticker, { modules: ['price', 'summaryDetail', 'summaryProfile', 'defaultKeyStatistics']});
+    const resultDetail = await yF.quoteSummary(query.ticker, { modules: ['price', 'summaryDetail', 'summaryProfile'] });
 
-    if (resultDetail) {
-      resultDetail = { 
-        price: {
-          longName = 'N/A',
-          regularMarketPrice: price
-        } = {},
-        summaryDetail: {
-          trailingPE,
-          forwardPE,
-          fiftyTwoWeekLow,
-          fiftyTwoWeekHigh
-        } = {},
-        summaryProfile: {
-          sector = 'N/A',
-          industry = 'N/A'
-        } = {},
-        defaultKeyStatistics: {
-          pegRatio = 'N/A'
-        } = {}
-      } = resultDetail;
-   }
+    //   if (resultDetail) {
+    //     resultDetail = {
+    //       price: {
+    //         longName = 'N/A',
+    //         regularMarketPrice: price
+    //       } = {},
+    //       summaryDetail: {
+    //         trailingPE,
+    //         forwardPE,
+    //         fiftyTwoWeekLow,
+    //         fiftyTwoWeekHigh
+    //       } = {},
+    //       summaryProfile: {
+    //         sector = 'N/A',
+    //         industry = 'N/A'
+    //       } = {}
+    //     } = resultDetail;
+    //  }
 
     res.json({ ...result, ...resultDetail });
-  } catch(err) {
-    // console.log(req.params.ticker, err.message);
+  } catch (err) {
     res.status(500);
-    res.json({ error: err.message });
+    res.json({ message: err.message });
   }
 });
 
 routerStocks.route('/sp-500').get(async (req, res) => {
-  let db_connect = dbo.getDb('powell');
-  db_connect
+  const dbConnect = dbo.getDb('powell');
+  dbConnect
     .collection('sp-500')
     .find({})
     .toArray((err, result) => {
