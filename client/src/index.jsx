@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { ChartProvider } from './contexts/ChartContext';
 import './css/index.css';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,3 +15,5 @@ root.render(
   </BrowserRouter>
   // </React.StrictMode>
 );
+
+serviceWorkerRegistration.register();
