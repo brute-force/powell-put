@@ -1,0 +1,48 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "react-app/jest",
+    "airbnb"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": [
+      "warn"
+    ],
+    "no-duplicate-imports": "error",
+    "spaced-comment": "error",
+    "camelcase": "error",
+    "object-curly-newline": "off",
+    "operator-linebreak": "off",
+    "comma-dangle": "off",
+    "jsx-quotes": [2, "prefer-double"],
+    "indent": ["error", 2],
+    "react/jsx-indent": ["error", 2],
+    "react/jsx-indent-props": ["error", 2],
+    "max-len": [
+      2,
+      {
+        "code": 120
+      }
+    ]
+  }
+}
