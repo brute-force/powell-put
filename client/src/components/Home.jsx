@@ -69,13 +69,24 @@ function Stocks() {
         value={stock}
         options={stocks}
         onChange={handleChange}
+        data-testid="autocomplete"
+        ListboxProps={{
+          'data-testid': 'list-box',
+          style: {
+            maxHeight: '450px',
+            border: '1px solid green'
+          }
+        }}
         renderInput={(params) => (
           <TextField
+            autoFocus
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...params}
+            data-testid="autocomplete-input"
             label="Search"
             InputProps={{
               ...params.InputProps,
+              'data-testid': 'input-props',
               type: 'search'
             }}
           />
