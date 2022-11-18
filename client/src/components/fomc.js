@@ -31,6 +31,18 @@ const fomcMeetings = [
     meetingStart: '07/26/22',
     meetingEnd: '07/27/22',
     notes: '75 bps'
+  },
+  {
+    id: 6,
+    meetingStart: '09/20/22',
+    meetingEnd: '09/21/22',
+    notes: '75 bps'
+  },
+  {
+    id: 7,
+    meetingStart: '11/01/22',
+    meetingEnd: '11/02/22',
+    notes: '75 bps'
   }
 ];
 
