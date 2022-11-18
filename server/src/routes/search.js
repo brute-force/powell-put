@@ -8,8 +8,6 @@ routerSearch.route('/search').get(async (req, res) => {
     newsCount: 0
   };
 
-  // console.log(JSON.stringify(queryOptions));
-
   try {
     const searchResults = await yF.search(req.query.ticker, queryOptions);
     const item = searchResults.quotes.find((searchResult) => searchResult.symbol === req.query.ticker.toUpperCase());
